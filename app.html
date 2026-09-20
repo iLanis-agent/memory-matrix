@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memory Matrix - how many tiles can your brain hold?</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; background:#0a0f1e; color:#dceaff; min-height:100vh; padding-bottom:50px; }
+  header { text-align:center; padding:30px 16px 4px; }
+  header h1 { font-size:30px; font-weight:800; }
+  header h1 span { color:#22d3ee; }
+  header p { color:#5f7396; margin-top:6px; font-size:15px; }
+  .wrap { max-width:520px; margin:0 auto; padding:0 16px; }
+  .bar { display:flex; justify-content:space-between; align-items:center; margin:16px 0 12px; font-size:14.5px; color:#5f7396; }
+  .bar b { color:#22d3ee; font-size:16px; }
+  #lives { color:#f87171; letter-spacing:2px; font-size:15px; }
+  #grid { display:grid; gap:8px; margin:10px auto 0; max-width:440px; }
+  .cell { aspect-ratio:1; background:#131c33; border:1px solid #1e2c4d; border-radius:10px; cursor:pointer; transition:background .18s ease, transform .1s ease; }
+  .cell:hover { border-color:#22d3ee88; }
+  .cell.lit { background:#22d3ee; border-color:#22d3ee; box-shadow:0 0 18px #22d3ee88; }
+  .cell.picked { background:#1f9bb3; border-color:#22d3ee; }
+  .cell.good { background:#34d399; border-color:#34d399; }
+  .cell.miss { background:#f87171; border-color:#f87171; animation:shake .3s; }
+  @keyframes shake { 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);} }
+  #start { display:block; margin:22px auto 0; background:linear-gradient(135deg,#22d3ee,#0284c7); border:none; color:#041220; font-size:17px; font-weight:800; padding:14px 40px; border-radius:12px; cursor:pointer; }
+  #msg { text-align:center; min-height:28px; margin-top:16px; font-size:16px; font-weight:700; }
+  #msg.good { color:#34d399; }
+  #msg.bad { color:#f87171; }
+  #msg.info { color:#5f7396; font-weight:500; }
+  footer { text-align:center; color:#3d4d6e; font-size:13px; margin-top:30px; }
+  footer a { color:#22d3ee; }
+</style>
+</head>
+<body>
+<header>
+  <h1>&#129504; Memory <span>Matrix</span></h1>
+  <p>Watch the pattern. Rebuild it from memory.</p>
+</header>
+<div class="wrap">
+  <div class="bar">
+    <div>level <b id="level">-</b> &middot; best <b id="best">0</b></div>
+    <div id="lives"></div>
+  </div>
+  <div id="grid"></div>
+  <div id="msg" class="info">Press start. Tiles light up - memorize them, then click them back.</div>
+  <button id="start">Start</button>
+</div>
+<footer>Best level stays in your browser.<br><a href="index.html">&larr; About</a> &nbsp;|&nbsp; Memory Matrix &middot; idea #16 from the iLanis App Factory</footer>
+<script>
+var G={level:0,lives:3,size:3,count:3,pattern:[],picked:[],phase:'idle',best:0};
+try{ G.best=(JSON.parse(localStorage.getItem('mm-best')||'{}')).best||0; }catch(_){}
+function $(id){return document.getElementById(id);}
+function setMsg(t,cls){ var m=$('msg'); m.textContent=t; m.className=cls||''; }
+function dims(level){
+  // grid grows as levels climb: 3x3 until lvl 4, 4x4 until lvl 8, then 5x5
+  var size = level<4 ? 3 : level<8 ? 4 : 5;
+  var count = 3+level;
+  var max=size*size-2;
+  if(count>max) count=max;
+  return {size:size,count:count};
+}
+function drawGrid(){
+  var d=dims(G.level);
+  G.size=d.size;
+  var gr=$('grid');
+  gr.style.gridTemplateColumns='repeat('+d.size+',1fr)';
+  var h='';
+  for(var i=0;i<d.size*d.size;i++) h+='<div class="cell" data-i="'+i+'"></div>';
+  gr.innerHTML=h;
+  document.querySelectorAll('.cell').forEach(function(c){
+    c.onclick=function(){ onCell(parseInt(c.getAttribute('data-i'))); };
+  });
+  $('level').textContent=G.level;
+  $('best').textContent=G.best;
+  $('lives').innerHTML='&#10084;'.repeat(G.lives)+'&#9825;'.repeat(Math.max(0,3-G.lives));
+}
+function newPattern(){
+  var d=dims(G.level);
+  G.count=d.count;
+  var pool=[];
+  for(var i=0;i<G.size*G.size;i++) pool.push(i);
+  G.pattern=[];
+  while(G.pattern.length<G.count){
+    var j=Math.floor(Math.random()*pool.length);
+    G.pattern.push(pool.splice(j,1)[0]);
+  }
+  G.picked=[];
+}
+function showPattern(){
+  G.phase='showing';
+  setMsg('Memorize...','info');
+  G.pattern.forEach(function(i){ document.querySelector('.cell[data-i="'+i+'"]').classList.add('lit'); });
+  var showMs=Math.max(700, 1500-G.level*60);
+  setTimeout(function(){
+    G.pattern.forEach(function(i){ var c=document.querySelector('.cell[data-i="'+i+'"]'); if(c) c.classList.remove('lit'); });
+    G.phase='input';
+    setMsg('Now click the '+G.count+' tiles.','info');
+  }, showMs);
+}
+function onCell(i){
+  if(G.phase!=='input') return;
+  if(G.picked.indexOf(i)>=0) return;
+  var cell=document.querySelector('.cell[data-i="'+i+'"]');
+  if(G.pattern.indexOf(i)>=0){
+    G.picked.push(i);
+    cell.classList.add('picked');
+    if(G.picked.length===G.pattern.length){
+      G.phase='feedback';
+      G.pattern.forEach(function(x){ document.querySelector('.cell[data-i="'+x+'"]').classList.add('good'); });
+      setMsg('Level '+G.level+' cleared!','good');
+      if(G.level>G.best){ G.best=G.level; try{ localStorage.setItem('mm-best',JSON.stringify({best:G.best})); }catch(_){}}
+      setTimeout(function(){ G.level++; start(); },900);
+    }
+  } else {
+    cell.classList.add('miss');
+    G.lives--;
+    G.phase='feedback';
+    G.pattern.forEach(function(x){ var c=document.querySelector('.cell[data-i="'+x+'"]'); if(G.picked.indexOf(x)<0) c.classList.add('good'); });
+    $('lives').innerHTML='&#10084;'.repeat(G.lives)+'&#9825;'.repeat(Math.max(0,3-G.lives));
+    if(G.lives<=0){
+      setMsg('Game over at level '+G.level+'. Best: '+G.best+'. Press start to go again.','bad');
+      G.phase='idle';
+      $('start').style.display='block';
+    } else {
+      setMsg('Wrong tile - the pattern is shown in green. Try again.','bad');
+      setTimeout(function(){ start(); },1500);
+    }
+  }
+}
+function start(){
+  if(G.phase==='idle'||G.phase==='feedback'){
+    if(G.lives<=0){ G.lives=3; G.level=0; }
+    if(G.level===0) G.level=1;
+    $('start').style.display='none';
+    drawGrid();
+    newPattern();
+    showPattern();
+  }
+}
+$('start').onclick=function(){ G.lives=3; G.level=1; G.phase='feedback'; start(); };
+drawGrid();
+</script>
+</body>
+</html>
