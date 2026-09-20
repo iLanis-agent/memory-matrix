@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memory Matrix - how many tiles can your brain hold?</title>
+<meta name="description" content="Memory Matrix flashes a pattern of tiles, then asks you to rebuild it from memory. The grid grows, the patterns grow, your brain protests. 3 lives, infinite levels.">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; background:#0a0f1e; color:#dceaff; min-height:100vh; }
+  .hero { min-height:92vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:40px 20px;
+    background:radial-gradient(ellipse 75% 50% at 50% 110%, #22d3ee1f 0%, #0284c714 40%, transparent 70%); }
+  .badge { font-size:12px; letter-spacing:2px; text-transform:uppercase; color:#22d3ee; border:1px solid #164e63; border-radius:999px; padding:6px 16px; margin-bottom:26px; }
+  h1 { font-size:clamp(38px,7.5vw,72px); font-weight:800; line-height:1.06;
+    background:linear-gradient(120deg,#e0f7ff,#22d3ee 45%,#0284c7); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { font-size:clamp(16px,2.4vw,21px); color:#5f7396; max-width:560px; margin-top:20px; line-height:1.55; }
+  .cta { margin-top:38px; display:inline-block; background:linear-gradient(135deg,#22d3ee,#0284c7); color:#041220; font-size:18px; font-weight:800;
+    padding:16px 44px; border-radius:14px; text-decoration:none; box-shadow:0 10px 34px #22d3ee40; transition:transform .15s ease; }
+  .cta:hover { transform:translateY(-2px); }
+  .feats { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; max-width:900px; margin:0 auto; padding:20px 20px 70px; }
+  .f { background:#101a30; border:1px solid #1c2b4a; border-radius:14px; padding:22px; }
+  .f .ic { font-size:26px; }
+  .f h3 { font-size:16px; margin:10px 0 6px; }
+  .f p { font-size:14px; color:#5f7396; line-height:1.5; }
+  footer { text-align:center; color:#3d4d6e; font-size:13px; padding:26px; border-top:1px solid #131e38; }
+  footer a { color:#22d3ee; }
+</style>
+</head>
+<body>
+  <section class="hero">
+    <div class="badge">iLanis App Factory &middot; idea #16</div>
+    <h1>Four tiles today.<br>Fifteen soon.</h1>
+    <p class="sub">A pattern of tiles lights up for a second, then vanishes. Click it back from memory. Clear a level and the pattern grows; the grid itself gets bigger as you climb. Three wrong tiles end the run.</p>
+    <a class="cta" href="app.html">Test your memory</a>
+  </section>
+  <section class="feats">
+    <div class="f"><div class="ic">&#129504;</div><h3>Real memory training</h3><p>Spatial working memory is one of the most trainable brain skills. This is the classic protocol, distilled to a game.</p></div>
+    <div class="f"><div class="ic">&#128200;</div><h3>It keeps growing</h3><p>3x3 becomes 4x4 becomes 5x5. Four tiles becomes fifteen. The ceiling is your brain, not the app.</p></div>
+    <div class="f"><div class="ic">&#10084;</div><h3>Three lives</h3><p>Miss a tile and the pattern shows itself one more time. Miss three and the run ends - but your best level is kept.</p></div>
+    <div class="f"><div class="ic">&#9889;</div><h3>No setup</h3><p>No account, no daily quest, no coins. Press start, stare at tiles, feel neurons strain.</p></div>
+  </section>
+  <footer>No sign-up. No tracking. Everything runs in your browser.<br>
+  Built by the <a href="https://ilanis-agent.github.io/app-factory/">iLanis App Factory</a> &middot; <a href="https://github.com/iLanis-agent/memory-matrix">source on GitHub</a></footer>
+</body>
+</html>
